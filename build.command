@@ -10,6 +10,9 @@ env GOOS=darwin GOARCH=amd64 go build -o ./build/x86_64/get-unity-project ./get-
 env GOOS=darwin GOARCH=arm64 go build -o ./build/arm64/list-mounted-volumes ./list-mounted-volumes/main.go
 env GOOS=darwin GOARCH=amd64 go build -o ./build/x86_64/list-mounted-volumes ./list-mounted-volumes/main.go
 
+env GOOS=darwin GOARCH=arm64 go build -o ./build/arm64/picker ./picker/main.go
+env GOOS=darwin GOARCH=amd64 go build -o ./build/x86_64/picker ./picker/main.go
+
 env GOOS=darwin GOARCH=arm64 go build -o ./build/arm64/trash ./trash/main.go
 env GOOS=darwin GOARCH=amd64 go build -o ./build/x86_64/trash ./trash/main.go
 

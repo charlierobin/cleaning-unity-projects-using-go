@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 )
 
 var logFile *os.File
@@ -22,9 +25,6 @@ type projectInfo struct {
 var unityProjects []projectInfo
 
 func main() {
-
-	fmt.Println("Pick the places you want to scan:")
-	fmt.Println("")
 
 	volumes := selectScanLocations()
 
@@ -62,13 +62,22 @@ func main() {
 	fmt.Println("")
 
 	if entered == "y" {
-
-		for i := 0; i < len(unityProjects); i++ {
-			fmt.Printf("%d:\t%s\t%s\t%s\t%s\n", i+1, unityProjects[i].path, unityProjects[i].version, unityProjects[i].name, unityProjects[i].company)
-		}
-
-		fmt.Println("")
+		unityProjects = selectProjects()
 	}
+
+	if len(unityProjects) == 0 {
+		fmt.Println("No Unity projects selected")
+		return
+	}
+
+	fmt.Println("Selected:")
+	fmt.Println("")
+
+	for i := 0; i < len(unityProjects); i++ {
+		fmt.Printf("%s\t%s\t%s\t%s\n", unityProjects[i].path, unityProjects[i].version, unityProjects[i].name, unityProjects[i].company)
+	}
+
+	fmt.Println("")
 
 	fmt.Println("Are you sure you want to clean them? (y/n)")
 	fmt.Scanln(&entered)
@@ -89,13 +98,107 @@ func main() {
 			unityProjects[i].status = "Cleaned"
 		}
 	}
+
+	fmt.Println("Done")
+}
+
+func selectProjects() []projectInfo {
+
+	var picked []projectInfo
+
+	tempFileData := "Please pick the projects you want to clean" + "\n"
+
+	for i := 0; i < len(unityProjects); i++ {
+		tempFileData = tempFileData + unityProjects[i].path + "\t" + unityProjects[i].version + "\t" + unityProjects[i].name + "\t" + unityProjects[i].company + "\n"
+	}
+
+	tempFileDataBytes := []byte(tempFileData)
+
+	tempFile, err := os.CreateTemp(os.TempDir(),"")
+
+	err = os.WriteFile(tempFile.Name(), tempFileDataBytes, 0644)
+
+	if err != nil {
+		writeErrorToLog(err)
+		return picked
+	}
+
+	cmd := exec.Command("osascript",
+		"-e", `tell application "Terminal" to activate`,
+		"-e", `tell application "System Events" to keystroke "t" using {command down}`,
+		"-e", `tell application "Terminal" to do script "`+executableDirectory("picker")+` `+tempFile.Name()+`" in front window`)
+
+	err = cmd.Run()
+
+	if err != nil {
+		writeErrorToLog(err)
+		return picked
+	}
+
+	origFileName := tempFile.Name()
+
+	filenameResponse := origFileName + "-response"
+
+	found := false
+
+	for !found {
+
+		time.Sleep(1 * time.Second)
+
+		f, err := os.Open(filenameResponse)
+		f.Close()
+
+		if err == nil {
+			found = true
+		}
+	}
+
+	content, err := ioutil.ReadFile(filenameResponse)
+
+	if err != nil {
+		writeErrorToLog(err)
+		return picked
+	}
+
+	err = os.Remove(origFileName)
+
+	if err != nil {
+		writeErrorToLog(err)
+	}
+
+	err = os.Remove(filenameResponse)
+
+	if err != nil {
+		writeErrorToLog(err)
+	}
+
+	str := strings.Trim(string((content)), "\n")
+
+	indexes := strings.Split(str, "\n")
+
+	for i := 0; i < len(indexes); i++ {
+
+		if indexes[i] != "" {
+
+			index, err := strconv.Atoi(indexes[i])
+
+			if err != nil {
+				writeErrorToLog(err)
+			}
+
+			picked = append(picked, unityProjects[index])
+		}
+	}
+
+	return picked
 }
 
 func selectScanLocations() []string {
 
-	locations := []string{}
+	var locations []string
 
 	out, err := exec.Command(executableDirectory("list-mounted-volumes")).Output()
+	// out, err := exec.Command("./list-mounted-volumes").Output()
 
 	if err != nil {
 		writeErrorToLog(err)
@@ -117,37 +220,90 @@ func selectScanLocations() []string {
 
 	volumes = append(volumes, userHomeDir+"/Documents")
 
-	var entered int = 1
+	tempFileData := "Please pick the places you want to scan" + "\n"
 
-	for entered > 0 {
+	for i := 0; i < len(volumes); i++ {
+		tempFileData = tempFileData + volumes[i] + "\n"
+	}
 
-		fmt.Println("Available locations:")
+	tempFileDataBytes := []byte(tempFileData)
 
-		for i := 0; i < len(volumes); i++ {
-			fmt.Println(i+1, volumes[i])
-		}
+	tempFile, err := os.CreateTemp(os.TempDir(),"")
 
-		fmt.Println("")
-		fmt.Println("Currently selected:")
+	err = os.WriteFile(tempFile.Name(), tempFileDataBytes, 0644)
 
-		if len(locations) == 0 {
-			fmt.Println("(none)")
+	if err != nil {
+		writeErrorToLog(err)
+		return locations
+	}
+
+	cmd := exec.Command("osascript",
+		"-e", `tell application "Terminal" to activate`,
+		"-e", `tell application "System Events" to keystroke "t" using {command down}`,
+		"-e", `tell application "Terminal" to do script "`+executableDirectory("picker")+` `+tempFile.Name()+`" in front window`)
+
+	err = cmd.Run()
+
+	if err != nil {
+		writeErrorToLog(err)
+		return locations
+	}
+
+	origFileName := tempFile.Name()
+
+	filenameResponse := origFileName + "-response"
+
+	found := false
+
+	for !found {
+
+		time.Sleep(1 * time.Second)
+
+		f, err := os.Open(filenameResponse)
+		f.Close()
+
+		if err != nil {
+			// fmt.Println("not found")
 		} else {
-			for i := 0; i < len(locations); i++ {
-				fmt.Println(locations[i])
-			}
+			// fmt.Println("found")
+			found = true
 		}
+	}
 
-		fmt.Println("")
+	content, err := ioutil.ReadFile(filenameResponse)
 
-		fmt.Print("❓ Enter a number (0 to finish) ")
-		fmt.Scanln(&entered)
+	if err != nil {
+		writeErrorToLog(err)
+		return locations
+	}
 
-		fmt.Println("")
+	err = os.Remove(origFileName)
 
-		if entered > 0 && entered <= len(volumes) {
-			locations = append(locations, volumes[entered-1])
-			volumes = append(volumes[:entered-1], volumes[entered:]...)
+	if err != nil {
+		writeErrorToLog(err)
+	}
+
+	err = os.Remove(filenameResponse)
+
+	if err != nil {
+		writeErrorToLog(err)
+	}
+
+	str = strings.Trim(string((content)), "\n")
+
+	indexes := strings.Split(str, "\n")
+
+	for i := 0; i < len(indexes); i++ {
+
+		if indexes[i] != "" {
+
+			index, err := strconv.Atoi(indexes[i])
+
+			if err != nil {
+				writeErrorToLog(err)
+			}
+
+			locations = append(locations, volumes[index])
 		}
 	}
 
