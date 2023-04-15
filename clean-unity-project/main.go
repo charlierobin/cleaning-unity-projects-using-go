@@ -33,13 +33,12 @@ func main() {
 func moveToTrash(path string, renamedPath string) {
 
 	f, err := os.Open(path)
+	f.Close()
 
 	if err != nil {
 		return
 	}
 
-	f.Close()
-	
 	err = os.Rename(path, renamedPath)
 
 	if err != nil {
