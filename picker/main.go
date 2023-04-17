@@ -97,6 +97,8 @@ func main() {
 					}
 				}
 			}
+
+			continue
 		}
 
 		index, err := strconv.Atoi(entered)

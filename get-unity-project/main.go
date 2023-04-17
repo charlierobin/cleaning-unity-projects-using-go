@@ -74,12 +74,17 @@ func getUnityProjectInfo(path string) (string, string, string) {
 		return "", "", ""
 	}
 
+	version := "⚠️ Unknown"
+
 	lines := strings.Split(string(content), "\n")
 
-	version := lines[0]
+	if len(lines) > 0 {
 
-	version = strings.ReplaceAll(version, "m_EditorVersion: ", "")
+		version = lines[0]
 
+		version = strings.ReplaceAll(version, "m_EditorVersion: ", "")
+	}
+	
 	content, err = ioutil.ReadFile(filepath.Join(path, "ProjectSettings/ProjectSettings.asset"))
 
 	if err != nil {
@@ -87,8 +92,8 @@ func getUnityProjectInfo(path string) (string, string, string) {
 		return "", "", ""
 	}
 
-	productName := ""
-	companyName := ""
+	productName := "⚠️ Unknown"
+	companyName := "⚠️ Unknown"
 
 	lines = strings.Split(string(content), "\n")
 

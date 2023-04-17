@@ -13,9 +13,9 @@ var logFile *os.File
 
 func main() {
 
-	ignore := []string{"/", "/dev", "/System/Volumes/Data", "/private/var/vm", "/System/Volumes/Data/home", "/Volumes/Recovery"}
+	ignore := []string{"/System/Volumes/Data", "/private/var/vm", "/Volumes/Recovery", "/"}
 
-	out, err := exec.Command("df").Output()
+	out, err := exec.Command("df", "-Hl").Output()
 
 	if err != nil {
 		writeErrorToLog(err)
