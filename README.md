@@ -14,7 +14,9 @@ So, the up side: lots of new extra free space.
 
 The down side: if you ever come back to open any of those projects, it will take a bit longer because Unity will have to regenerate a load of cached stuff. On a big project, that can take quite a bit of time. *What the heck, for me it was worth it.*
 
-The **main**:
+https://user-images.githubusercontent.com/10506323/233324827-d91ac4e2-2dec-44a6-9550-2d698d0e9b13.mp4
+
+The **main** components are:
 
 ## unity-projects-cleaner
 
