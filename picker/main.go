@@ -150,6 +150,9 @@ func main() {
 	if err != nil {
 		writeErrorToLog(err)
 	}
+
+	fmt.Println("💬 This tab is finished and you can close it")
+	fmt.Println("")
 }
 
 func writeToLog(message string) {
