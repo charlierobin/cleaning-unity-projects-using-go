@@ -14,7 +14,7 @@ So, the up side: lots of new extra free space.
 
 The down side: if you ever come back to open any of those projects, it will take a bit longer because Unity will have to regenerate a load of cached stuff. On a big project, that can take quite a bit of time. *What the heck, for me it was worth it.*
 
-https://user-images.githubusercontent.com/10506323/233324827-d91ac4e2-2dec-44a6-9550-2d698d0e9b13.mp4
+https://user-images.githubusercontent.com/10506323/233540403-978f67d2-2a73-4555-b9b9-2c4f0ce805e5.mp4
 
 The **main** components are:
 
