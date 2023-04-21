@@ -14,7 +14,9 @@ So, the up side: lots of new extra free space.
 
 The down side: if you ever come back to open any of those projects, it will take a bit longer because Unity will have to regenerate a load of cached stuff. On a big project, that can take quite a bit of time. *What the heck, for me it was worth it.*
 
-The **main**:
+https://user-images.githubusercontent.com/10506323/233324827-d91ac4e2-2dec-44a6-9550-2d698d0e9b13.mp4
+
+The **main** components are:
 
 ## unity-projects-cleaner
 
@@ -113,7 +115,19 @@ Otherwise you’ll see nothing.
 
 ## Notes
 
-With the exception of the implementation of `trash` and `list-mounted-volumes`, I think most of this would be happy enough on Windows with a bit of tweaking here and there. But having said that, I’ve not actually tested any of it out!
+With the exception of the implementation of `trash` and `list-mounted-volumes`, I think most of this would be happy enough on Windows with a bit of tweaking here and there. (See the additional added notes below.) But having said that, I’ve not actually tested any of it out.
+
+---
+
+### Additional observations on the above…
+
+The above is perhaps not really true anymore, as I’ve added `picker`, which is a generic app for selecting from a bunch of options. It’s used both to allow the user to select from the list of available volumes, and to select from the list of found projects.
+
+It’s opened by Applescript commands sent to the Terminal app, because I wanted it to appear in a new tab, whilst the calling app waits in the background. (There was no particular compelling design decision behind this, I was just curious to see how it could be made to work.)
+
+Which means that to get it working on Windows or Linux you’ll have to deal with the above, as well as the couple of other places where it’s all gone a bit macOS-centric.
+
+---
 
 At the moment, everything is designed to be run from the top level of the `build` directory. (That’s where the `config.json` and log file live, and that’s where all the apps will expect to find each other when they try to call each other. There’s no adding these apps to your bash path or anything like that.)
 
